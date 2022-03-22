@@ -1,4 +1,5 @@
 # Database git ignore
 
-data/**/*
+data/
+/aws_def_values.py
 
