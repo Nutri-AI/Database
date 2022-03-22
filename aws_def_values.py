@@ -8,8 +8,8 @@ aws_access = {
 
 
 # DynamoDB
-table_nutriai = # table name
+table_nutriai = ''# table name
 
 
 # S3
-bucket_nutriai = # bucket name
+bucket_nutriai = ''# bucket name
