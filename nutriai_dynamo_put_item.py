@@ -84,7 +84,7 @@ def put_items(table, data):
 
 # 음식 영양 정보 : csv -> json
 # column order : 'food_cat', 'food_name', 'serving_amount', 'serving_unit' and 'nutrients'
-def preproc_food(data_path:str) -> list:
+def preprocessing_food(data_path:str) -> list:
     data_df = pd.read_csv(data_path, na_values=0, dtype=str)
     food_df = pd.DataFrame(columns=['PK','SK','qty','nutrients'])
     # PK
@@ -103,7 +103,7 @@ def preproc_food(data_path:str) -> list:
 
 # 권장 섭취량 정보 : csv
 # column : 'PK', 'SK' and nutrients 'RDI'
-def preproc_rdi(data_path:str) -> list:
+def preprocessing_rdi(data_path:str) -> list:
     data_df = pd.read_csv(data_path, dtype=str)
     rdi_df = pd.DataFrame(columns=['PK','SK','RDI'])
     # PK
@@ -119,19 +119,25 @@ def preproc_rdi(data_path:str) -> list:
     return rdi_json_list
 
 # 영양제 정보 : json
-def preporc_nutrsuppl(data_path:str, nutrsuppl_cat:list) -> list:
+def preprocessing_nutrsuppl(data_path:str, nutrsuppl_cat:list) -> list:
     nutrsuppl_list = list()
     for cat in nutrsuppl_cat:
         file_path = glob(os.path.join(data_path,cat,'*'))
         for file in file_path:
             with open(file, 'r', encoding='utf-8-sig') as json_file:
                 file = json.load(json_file)
+                # PK attr
                 file['PK'] = f'NUTRSUPPL#{cat}'
+                # SK attr
                 temp = file.pop('prod_cd')
                 file['SK'] = f'NUTRSUPPL#{temp}'
+                # nutrsuppl_url
+                file['nutrsuppl_url'] = file.pop('url')
+                # nutrients attr
                 for nutr in file['nutrients']:
                     temp_nutr = file['nutrients'].get(nutr)[0]
                     file['nutrients'][nutr] = temp_nutr
+                # serving attr
                 temp_srv = file['serving']
                 file['serving'] = {
                     'serving_amount': temp_srv[0],
@@ -162,9 +168,9 @@ if __name__=='__main__':
     nutrsuppl_cat = ['amino-acids','minerals','vitamins']
 
     # data
-    rdi_data = preproc_rdi(rdi_path) # dict list
-    food_data = preproc_food(food_path) # dict list
-    nutrsuppl_data = preporc_nutrsuppl(nutrsuppl_path, nutrsuppl_cat)
+    rdi_data = preprocessing_rdi(rdi_path) # dict list
+    food_data = preprocessing_food(food_path) # dict list
+    nutrsuppl_data = preprocessing_nutrsuppl(nutrsuppl_path, nutrsuppl_cat)
 
     print('\nput RDI data : ')
     put_items(table, rdi_data)
