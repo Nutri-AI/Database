@@ -7,7 +7,7 @@ import logging
 import os
 import pandas as pd
 import json
-from decimal import Decimal
+from decimal import *
 from tqdm import tqdm
 from glob import glob
 
@@ -45,7 +45,7 @@ def convert_Decimal(data):
             convert_Decimal(v)
         else:
             try:
-                data[k] = Decimal(str(round(v,1)))
+                data[k] = Decimal(str(v)).quantize(Decimal('.1'), rounding=ROUND_HALF_UP)
             except:
                 pass
     return data
