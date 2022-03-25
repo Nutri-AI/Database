@@ -2,6 +2,7 @@
 
 /.DS_Store
 .*.swp
+**/__pycache__/
 
 data/
 /aws_def_values.py
