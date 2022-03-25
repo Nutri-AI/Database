@@ -45,7 +45,7 @@ def convert_Decimal(data):
             convert_Decimal(v)
         else:
             try:
-                data[k] = Decimal(str(v))
+                data[k] = Decimal(str(round(v,1)))
             except:
                 pass
     return data
@@ -56,7 +56,6 @@ def put_items(table, data):
         for item in tqdm(data):
             try:
                 convert_Decimal(item)
-                print(item)
                 table.put_item(
                     Item=item,
                     # ConditionExpression='attribute_not_exists(PK) AND attribute_not_exists(SK)'
@@ -66,7 +65,6 @@ def put_items(table, data):
     elif type(data) == dict:
         try:
             convert_Decimal(data)
-            print(item)
             table.put_item(
                 Item=item,
                 # ConditionExpression='attribute_not_exists(PK) AND attribute_not_exists(SK)'
