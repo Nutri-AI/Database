@@ -155,7 +155,7 @@ def preprocessing_nutrsuppl(data_path:str, nutrsuppl_cat:list) -> list:
 # after nutriai_dynamo_create_table.py
 if __name__=='__main__':
     table = get_table(
-        table_name='nutriai_test',
+        table_name=table_nutriai,
         access=aws_access
     )
 
