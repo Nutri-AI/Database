@@ -1,5 +1,8 @@
 # Database git ignore
 
+/.DS_Store
+.*.swp
+
 data/
 /aws_def_values.py
 
