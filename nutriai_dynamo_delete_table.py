@@ -37,7 +37,7 @@ def delete_table(client, table_name:str):
             TableName=table_name
         )
         deleted_table = response['TableDescription']['TableName']
-        time.sleep(2)
+        time.sleep(3)
         print(f'delete {deleted_table} Table')
     except ClientError as e:
         logging.error(e)
