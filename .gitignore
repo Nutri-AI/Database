@@ -1,9 +1,11 @@
 # Database git ignore
 
-/.DS_Store
+**/.DS_Store
 .*.swp
 **/__pycache__/
 
 data/*
-/aws_def_values.py
+
+# security
+code/aws_def_values.py
 
