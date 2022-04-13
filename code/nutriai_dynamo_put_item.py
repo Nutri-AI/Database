@@ -1,5 +1,4 @@
 # 시스템에 필요한 데이터 DB 
-
 import boto3
 import botocore
 import logging
@@ -149,9 +148,6 @@ def preprocessing_nutrsuppl(data_path:str, nutrsuppl_cat:list) -> list:
 
 
 
-
-
-
 # after nutriai_dynamo_create_table.py
 if __name__=='__main__':
     table = get_table(
@@ -160,9 +156,9 @@ if __name__=='__main__':
     )
 
     # files path
-    rdi_path = os.path.join('data','RDI.csv')
-    food_path = os.path.join('data','food_final.csv')
-    nutrsuppl_path = os.path.join('data','nutrsuppl')
+    rdi_path = os.path.join('/','dynamo','data','RDI.csv')
+    food_path = os.path.join('/','dynamo','data','food_final.csv')
+    nutrsuppl_path = os.path.join('/','dynamo','data','nutrsuppl')
     nutrsuppl_cat = ['amino-acids','minerals','vitamins']
 
     # data
