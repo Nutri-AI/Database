@@ -11,3 +11,4 @@ RUN pip install tqdm>=4.41.0
 RUN pip install uvicorn
 RUN pip install boto3
 
+WORKDIR /dynamo
