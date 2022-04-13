@@ -4,6 +4,6 @@
 .*.swp
 **/__pycache__/
 
-data/
+data/*
 /aws_def_values.py
 
