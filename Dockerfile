@@ -12,3 +12,7 @@ RUN pip install boto3
 
 WORKDIR /dynamo
 
+####### start with Dockerfile
+# docker build . -t <name>:<tag>
+# docker run --rm -ti -v $(pws):/dynamo <name>:<tag> bash
+
