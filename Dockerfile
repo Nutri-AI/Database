@@ -8,7 +8,6 @@ RUN apt-get update
 RUN pip install numpy>=1.18.5
 RUN pip install pandas>=1.1.4
 RUN pip install tqdm>=4.41.0
-RUN pip install uvicorn
 RUN pip install boto3
 
 WORKDIR /dynamo
