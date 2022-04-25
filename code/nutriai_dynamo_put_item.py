@@ -1,5 +1,4 @@
 # 시스템에 필요한 데이터 DB 
-
 import boto3
 import botocore
 import logging
@@ -7,7 +6,7 @@ import logging
 import os
 import pandas as pd
 import json
-from decimal import Decimal
+from decimal import *
 from tqdm import tqdm
 from glob import glob
 
@@ -45,7 +44,7 @@ def convert_Decimal(data):
             convert_Decimal(v)
         else:
             try:
-                data[k] = Decimal(str(v))
+                data[k] = Decimal(str(v)).quantize(Decimal('.1'), rounding=ROUND_HALF_UP)
             except:
                 pass
     return data
@@ -56,7 +55,6 @@ def put_items(table, data):
         for item in tqdm(data):
             try:
                 convert_Decimal(item)
-                print(item)
                 table.put_item(
                     Item=item,
                     # ConditionExpression='attribute_not_exists(PK) AND attribute_not_exists(SK)'
@@ -66,7 +64,6 @@ def put_items(table, data):
     elif type(data) == dict:
         try:
             convert_Decimal(data)
-            print(item)
             table.put_item(
                 Item=item,
                 # ConditionExpression='attribute_not_exists(PK) AND attribute_not_exists(SK)'
@@ -84,7 +81,7 @@ def put_items(table, data):
 
 # 음식 영양 정보 : csv -> json
 # column order : 'food_cat', 'food_name', 'serving_amount', 'serving_unit' and 'nutrients'
-def preproc_food(data_path:str) -> list:
+def preprocessing_food(data_path:str) -> list:
     data_df = pd.read_csv(data_path, na_values=0, dtype=str)
     food_df = pd.DataFrame(columns=['PK','SK','qty','nutrients'])
     # PK
@@ -103,7 +100,7 @@ def preproc_food(data_path:str) -> list:
 
 # 권장 섭취량 정보 : csv
 # column : 'PK', 'SK' and nutrients 'RDI'
-def preproc_rdi(data_path:str) -> list:
+def preprocessing_rdi(data_path:str) -> list:
     data_df = pd.read_csv(data_path, dtype=str)
     rdi_df = pd.DataFrame(columns=['PK','SK','RDI'])
     # PK
@@ -119,19 +116,25 @@ def preproc_rdi(data_path:str) -> list:
     return rdi_json_list
 
 # 영양제 정보 : json
-def preporc_nutrsuppl(data_path:str, nutrsuppl_cat:list) -> list:
+def preprocessing_nutrsuppl(data_path:str, nutrsuppl_cat:list) -> list:
     nutrsuppl_list = list()
     for cat in nutrsuppl_cat:
         file_path = glob(os.path.join(data_path,cat,'*'))
         for file in file_path:
             with open(file, 'r', encoding='utf-8-sig') as json_file:
                 file = json.load(json_file)
+                # PK attr
                 file['PK'] = f'NUTRSUPPL#{cat}'
+                # SK attr
                 temp = file.pop('prod_cd')
                 file['SK'] = f'NUTRSUPPL#{temp}'
+                # nutrsuppl_url
+                file['nutrsuppl_url'] = file.pop('url')
+                # nutrients attr
                 for nutr in file['nutrients']:
                     temp_nutr = file['nutrients'].get(nutr)[0]
                     file['nutrients'][nutr] = temp_nutr
+                # serving attr
                 temp_srv = file['serving']
                 file['serving'] = {
                     'serving_amount': temp_srv[0],
@@ -145,26 +148,23 @@ def preporc_nutrsuppl(data_path:str, nutrsuppl_cat:list) -> list:
 
 
 
-
-
-
 # after nutriai_dynamo_create_table.py
 if __name__=='__main__':
     table = get_table(
-        table_name='nutriai_test',
+        table_name=table_nutriai,
         access=aws_access
     )
 
     # files path
-    rdi_path = os.path.join('data','RDI.csv')
-    food_path = os.path.join('data','food_final.csv')
-    nutrsuppl_path = os.path.join('data','nutrsuppl')
+    rdi_path = os.path.join('/','dynamo','data','RDI.csv')
+    food_path = os.path.join('/','dynamo','data','food_final.csv')
+    nutrsuppl_path = os.path.join('/','dynamo','data','nutrsuppl')
     nutrsuppl_cat = ['amino-acids','minerals','vitamins']
 
     # data
-    rdi_data = preproc_rdi(rdi_path) # dict list
-    food_data = preproc_food(food_path) # dict list
-    nutrsuppl_data = preporc_nutrsuppl(nutrsuppl_path, nutrsuppl_cat)
+    rdi_data = preprocessing_rdi(rdi_path) # dict list
+    food_data = preprocessing_food(food_path) # dict list
+    nutrsuppl_data = preprocessing_nutrsuppl(nutrsuppl_path, nutrsuppl_cat)
 
     print('\nput RDI data : ')
     put_items(table, rdi_data)

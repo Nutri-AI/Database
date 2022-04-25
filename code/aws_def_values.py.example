@@ -1,0 +1,11 @@
+
+## for AWS Access 
+aws_access = {
+    'region_ap': '', # AWS region
+    'aws_access_key_id': '', # AWS Access key ID
+    'aws_secret_access_key': '' # AWS Secret access key
+}
+
+
+# DynamoDB
+table_nutriai = "" # table name
