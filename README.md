@@ -1,4 +1,4 @@
-# Design a Database for NutriAI
+# Design NutriAI Database
 Using the AWS SDK for Python [Boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html) to create, configure, and manage AWS services, Amazon DynamoDB.
 ### [Amazon DynamoDB](https://aws.amazon.com/dynamodb/)
 - 아마존의 NoSQL 데이터베이스 서비스
