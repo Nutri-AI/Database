@@ -7,7 +7,7 @@ Using the AWS SDK for Python [Boto3](https://boto3.amazonaws.com/v1/documentatio
 
 ## ERD
 <div align="center">
-  <img width="55%" alt="NutriAI_database_ERD" src="https://github.com/Nutri-AI/.github/blob/main/profile/images/ERD_key.drawio.png">
+  <img width="65%" alt="NutriAI_database_ERD" src="https://github.com/Nutri-AI/.github/blob/main/profile/images/ERD_key.drawio.png">
 </div>
 
 ## Design the primary key
