@@ -5,13 +5,12 @@ Using the AWS SDK for Python [Boto3](https://boto3.amazonaws.com/v1/documentatio
 - 완전 관리형의 서버리스 데이터베이스
 - 키-값 쿼리 형식
 
-## Implementation
-### ERD
+## ERD
 <div align="center">
   <img width="55%" alt="NutriAI_database_ERD" src="https://github.com/Nutri-AI/.github/blob/main/profile/images/ERD_key.drawio.png">
 </div>
 
-### Design the primary key
+## Design the primary key
 <table>
     <thead>
         <tr>
@@ -56,7 +55,7 @@ Using the AWS SDK for Python [Boto3](https://boto3.amazonaws.com/v1/documentatio
     </tbody>
 </table>
 
-### Prerequisites
+## Prerequisites
 Edit code/aws_def_values.py.example file
    ```python
    # code/aws_def_values.py
@@ -73,7 +72,7 @@ Edit code/aws_def_values.py.example file
 
 Make data/ directory and put the data files into the data/ directory for DB.
 
-### Start with Dockerfile
+## Start with Dockerfile
 Build image
    ```sh
 docker build . -t <name>:<tag>
@@ -82,6 +81,8 @@ Run image
    ```sh
 docker run --rm -ti -v $(pws):/dynamo <name>:<tag> bash
    ```
+
+## Implementation
 
 ### Create a table
    ```sh
