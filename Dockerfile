@@ -14,5 +14,5 @@ WORKDIR /dynamo
 
 ####### start with Dockerfile
 # docker build . -t <name>:<tag>
-# docker run --rm -ti -v $(pws):/dynamo <name>:<tag> bash
+# docker run --rm -ti -v $(pwd):/dynamo <name>:<tag> bash
 
