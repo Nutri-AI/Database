@@ -87,7 +87,7 @@ def put_items(table, data):
 # column order : 'food_cat', 'food_name', 'serving_amount', 'serving_unit' and 'nutrients'
 def preprocessing_food(data_path:str) -> list:
     data_df = pd.read_csv(data_path, na_values=0, dtype=str)
-    food_df = pd.DataFrame(columns=['PK','SK','food_cat','cmpny','qty','nutrients'])
+    food_df = pd.DataFrame(columns=['PK','SK','cmpny','qty','nutrients'])
     # SK
     food_df['SK'] = 'FOOD#' + data_df['food_name']
     # PK
@@ -190,34 +190,39 @@ if __name__=='__main__':
     )
 
     # files path
-    rdi_path = os.path.join('/','dynamo','data','RDI_final.csv')
-    food_path = os.path.join('/','dynamo','data','food_final.csv')
-    nutrsuppl_path = os.path.join('/','dynamo','data','nutrsuppl')
+    rdi_path = os.path.join(os.pardir,'dynamo','data','RDI_final.csv')
+    food_path = os.path.join(os.pardir,'dynamo','data','food_final.csv')
+    food_search_path = os.path.join(os.pardir,'dynamo','data','food_search_final.csv')
+    nutrsuppl_path = os.path.join(os.pardir,'dynamo','data','nutrsuppl')
     nutrsuppl_cat = ['amino-acids','minerals','vitamins']
-    brcd_path = os.path.join('/','dynamo','data','brcd_final.csv')
+    brcd_path = os.path.join(os.pardir,'dynamo','data','brcd_final.csv')
 
     # data
     print("\nData Preprocessing...")
     rdi_data = preprocessing_rdi(rdi_path) # dict list
     food_data = preprocessing_food(food_path) # dict list
-    # nutrsuppl_data = preprocessing_nutrsuppl(nutrsuppl_path, nutrsuppl_cat)
-    # brcd_data = preprocessing_brcd(brcd_path)
+    food_search_data = preprocessing_food(food_search_path)
+    nutrsuppl_data = preprocessing_nutrsuppl(nutrsuppl_path, nutrsuppl_cat)
+    brcd_data = preprocessing_brcd(brcd_path)
 
-    # print('\nput RDI data : ')
-    # put_items(table, rdi_data)
+    print('\nput RDI data...')
+    put_items(table, rdi_data)
 
-    print('\nput food data : ')
+    print('\nput food data...')
     put_items(table, food_data)
 
-    # print('\nput nutrition supplement data : ')
-    # put_items(table, nutrsuppl_data)
+    print('\nput food data for searching...')
+    put_items(table, food_search_data)
 
-    # print('\nput barcode data : ')
-    # put_items(table, brcd_data)
+    print('\nput nutrition supplement data...')
+    put_items(table, nutrsuppl_data)
 
-    print('end uploading!!')
+    print('\nput barcode data...')
+    put_items(table, brcd_data)
+
+    print('\nend uploading!!')
 
 
-    print('\nTable item count: ', table.item_count)
+    # print('\nTable item count: ', table.item_count)
 
 
