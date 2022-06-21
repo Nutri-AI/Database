@@ -1,14 +1,18 @@
 # 시스템에 필요한 데이터 DB 
+from distutils.log import error
 import boto3
 import botocore
 import logging
 
 import os
+import numpy as np
 import pandas as pd
+from datetime import datetime, timedelta
 import json
 from decimal import *
 from tqdm import tqdm
 from glob import glob
+import re
 
 from aws_def_values import *
 
@@ -83,11 +87,13 @@ def put_items(table, data):
 # column order : 'food_cat', 'food_name', 'serving_amount', 'serving_unit' and 'nutrients'
 def preprocessing_food(data_path:str) -> list:
     data_df = pd.read_csv(data_path, na_values=0, dtype=str)
-    food_df = pd.DataFrame(columns=['PK','SK','qty','nutrients'])
-    # PK
-    food_df['PK'] = 'FOOD#' + data_df['food_cat']
+    food_df = pd.DataFrame(columns=['PK','SK','cmpny','qty','nutrients'])
     # SK
     food_df['SK'] = 'FOOD#' + data_df['food_name']
+    # PK
+    food_df['PK'] = 'FOOD#' + data_df['food_cat']
+    # cmpny
+    food_df['cmpny'] = 'not' #data_df['cmpny']
     # qty
     food_df['qty'] = data_df[['serving_amount','serving_unit']].apply(dict, axis=1)
     # nutrients
@@ -143,6 +149,34 @@ def preprocessing_nutrsuppl(data_path:str, nutrsuppl_cat:list) -> list:
                 nutrsuppl_list.append(file)
     return nutrsuppl_list
 
+# 바코드 정보 : csv -> json
+# column : 'prdt', 'brcd', 'cmpny', 'serving_amount', 'serving_unit' and 'nutrients'
+def preprocessing_brcd(data_path:str) -> list:
+    data_df = pd.read_csv(data_path, na_values=0, dtype=str)
+    data_col = data_df.columns
+    brcd_df = pd.DataFrame(columns=['PK','SK','food_name','cmpny','food_cat','qty','nutrients'])
+    # SK
+    brcd_df['SK'] = 'BRCD#' + data_df['brcd']
+    # PK
+    brcd_df['PK'] = 'BRCD#brcd'
+    # food_name
+    brcd_df['food_name'] = data_df['prdt']
+    # cmpny
+    brcd_df['cmpny'] = data_df['cmpny']
+    # food_cat
+    brcd_df['food_cat'] = data_df['food_cat']
+    # qty
+    brcd_df['qty'] = data_df[['serving_amount','serving_unit']].apply(dict, axis=1)
+    # nutrients
+    to_del = ['prdt', 'brcd', 'cmpny', 'year', 'food_cat', 'serving_amount', 'serving_unit',]
+    nutr_col = [col for col in data_col if col not in to_del]
+    drop0 = lambda row: row.dropna().to_dict()
+    brcd_df['nutrients'] = data_df[nutr_col].apply(drop0, axis=1)
+    # to json
+    food_json_str = brcd_df.to_json(orient='records', force_ascii=False)
+    food_json_list = json.loads(food_json_str)
+    return food_json_list
+
 
 
 
@@ -156,29 +190,39 @@ if __name__=='__main__':
     )
 
     # files path
-    rdi_path = os.path.join('/','dynamo','data','RDI.csv')
-    food_path = os.path.join('/','dynamo','data','food_final.csv')
-    nutrsuppl_path = os.path.join('/','dynamo','data','nutrsuppl')
+    rdi_path = os.path.join(os.pardir,'dynamo','data','RDI_final.csv')
+    food_path = os.path.join(os.pardir,'dynamo','data','food_final.csv')
+    food_search_path = os.path.join(os.pardir,'dynamo','data','food_search_final.csv')
+    nutrsuppl_path = os.path.join(os.pardir,'dynamo','data','nutrsuppl')
     nutrsuppl_cat = ['amino-acids','minerals','vitamins']
+    brcd_path = os.path.join(os.pardir,'dynamo','data','brcd_final.csv')
 
     # data
+    print("\nData Preprocessing...")
     rdi_data = preprocessing_rdi(rdi_path) # dict list
     food_data = preprocessing_food(food_path) # dict list
+    food_search_data = preprocessing_food(food_search_path)
     nutrsuppl_data = preprocessing_nutrsuppl(nutrsuppl_path, nutrsuppl_cat)
+    brcd_data = preprocessing_brcd(brcd_path)
 
-    print('\nput RDI data : ')
+    print('\nput RDI data...')
     put_items(table, rdi_data)
 
-    print('\nput food data : ')
+    print('\nput food data...')
     put_items(table, food_data)
 
-    print('\nput nutrition supplement data : ')
+    print('\nput food data for searching...')
+    put_items(table, food_search_data)
+
+    print('\nput nutrition supplement data...')
     put_items(table, nutrsuppl_data)
 
-    print('end uploading!!')
+    print('\nput barcode data...')
+    put_items(table, brcd_data)
+
+    print('\nend uploading!!')
 
 
-    print('\nTable item count: ', table.item_count)
-
+    # print('\nTable item count: ', table.item_count)
 
 
