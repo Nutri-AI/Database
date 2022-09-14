@@ -79,7 +79,7 @@ docker build . -t <name>:<tag>
    ```
 Run image
    ```sh
-docker run --rm -ti -v $(pws):/dynamo <name>:<tag> bash
+docker run --rm -ti -v $(pwd):/dynamo <name>:<tag> bash
    ```
 
 ## Implementation
